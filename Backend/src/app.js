@@ -1,17 +1,29 @@
-require('dotenv').config();
-const express = require('express');
-const http = require('http');
-const WebSocket = require('ws');
-const cors = require('cors');
-const connectDB = require('./config/db');
-const authRoutes = require('./routes/auth');
-const { verifyToken } = require('./utils/jwt');
-const User = require('./models/user');
-const Message = require('./models/message');
+import cors from 'cors';
+import express from 'express';
+import { connect } from 'mongoose';
+import { WebSocketServer } from 'ws';
 
-const app = express();
+const connectDB = async() => {
+    try {
+        await connect(process.env.MONGODB_URI);
+        console.log('MongoDB connected successfully');
+    } catch (error) {
+        console.error('MongoDB connection error:', error);
+        process.exit(1);
+    }
+};
+
+export default connectDB;
+// eServer(app);
+// Create an HTTP server from Express
+import http from 'http';
+import WebSocket from 'ws';
+import Message from './models/message.js';
+import User from './models/user.js';
+import authRoutes from './routes/auth.js';
+import { verifyToken } from './utils/jwt.js';
 const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
+const wss = new WebSocketServer({ server });
 
 // Connect to MongoDB
 connectDB();

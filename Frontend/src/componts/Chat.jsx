@@ -40,7 +40,7 @@ function Chat({ user, onLogout }) {
       websocketService.off("typing", handleTyping);
       websocketService.disconnect();
     };
-  }, []);
+  }, [handleTyping]);
 
   useEffect(() => {
     scrollToBottom();
@@ -56,6 +56,7 @@ function Chat({ user, onLogout }) {
     setOnlineUsers(message.users || []);
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleTyping = (message) => {
     if (message.username === user.username) return;
 

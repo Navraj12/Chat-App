@@ -1,5 +1,5 @@
-import { findById } from '../models/user';
-import { verifyToken } from '../utils/jwt';
+import { User } from '../models/user.js';
+import { verifyToken } from '../utils/jwt.js';
 
 const authMiddleware = async(req, res, next) => {
     try {
@@ -15,7 +15,7 @@ const authMiddleware = async(req, res, next) => {
             return res.status(401).json({ message: 'Invalid token' });
         }
 
-        const user = await findById(decoded.id).select('-password');
+        const user = await User.findById(decoded.id).select('-password');
 
         if (!user) {
             return res.status(401).json({ message: 'User not found' });
