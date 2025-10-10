@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { authAPI } from "../services/api";
 import websocketService from "../services/websocket";
 
@@ -11,19 +11,45 @@ function Chat({ user, onLogout }) {
   const messagesEndRef = useRef(null);
   const typingTimeoutRef = useRef(null);
 
+  // 🧠 Handler: new incoming message
+  const handleNewMessage = useCallback((message) => {
+    if (message.data) {
+      setMessages((prev) => [...prev, message.data]);
+    }
+  }, []);
+
+  // 🧠 Handler: update online users
+  const handleOnlineUsers = useCallback((message) => {
+    setOnlineUsers(message.users || []);
+  }, []);
+
+  // 🧠 Handler: show typing indicator
+  const handleTyping = useCallback(
+    (message) => {
+      if (message.username === user.username) return;
+
+      if (message.isTyping) {
+        setTypingUsers((prev) =>
+          prev.includes(message.username) ? prev : [...prev, message.username]
+        );
+      } else {
+        setTypingUsers((prev) => prev.filter((u) => u !== message.username));
+      }
+    },
+    [user.username]
+  );
+
+  // 🧠 Connect to WebSocket and load messages
   useEffect(() => {
     const initChat = async () => {
       try {
-        // Load previous messages
         const response = await authAPI.getMessages();
         setMessages(response.data);
 
-        // Connect to WebSocket
         const token = localStorage.getItem("token");
         await websocketService.connect(token);
         setIsConnected(true);
 
-        // Set up WebSocket listeners
         websocketService.on("chat_message", handleNewMessage);
         websocketService.on("online_users", handleOnlineUsers);
         websocketService.on("typing", handleTyping);
@@ -40,39 +66,14 @@ function Chat({ user, onLogout }) {
       websocketService.off("typing", handleTyping);
       websocketService.disconnect();
     };
-  }, [handleTyping]);
+  }, [handleNewMessage, handleOnlineUsers, handleTyping]);
 
+  // 🧠 Scroll chat to bottom when messages update
   useEffect(() => {
-    scrollToBottom();
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleNewMessage = (message) => {
-    if (message.data) {
-      setMessages((prev) => [...prev, message.data]);
-    }
-  };
-
-  const handleOnlineUsers = (message) => {
-    setOnlineUsers(message.users || []);
-  };
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const handleTyping = (message) => {
-    if (message.username === user.username) return;
-
-    if (message.isTyping) {
-      setTypingUsers((prev) =>
-        prev.includes(message.username) ? prev : [...prev, message.username]
-      );
-    } else {
-      setTypingUsers((prev) => prev.filter((u) => u !== message.username));
-    }
-  };
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
+  // 🧠 Send message
   const handleSendMessage = (e) => {
     e.preventDefault();
     if (newMessage.trim() && isConnected) {
@@ -82,18 +83,18 @@ function Chat({ user, onLogout }) {
     }
   };
 
+  // 🧠 Handle typing indicator
   const handleInputTyping = () => {
     websocketService.sendTyping(true);
-
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
     }
-
     typingTimeoutRef.current = setTimeout(() => {
       websocketService.sendTyping(false);
     }, 1000);
   };
 
+  // 🧠 Logout
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
@@ -101,16 +102,20 @@ function Chat({ user, onLogout }) {
     onLogout();
   };
 
-  const formatTime = (date) => {
-    return new Date(date).toLocaleTimeString("en-US", {
+  // 🧠 Time formatter
+  const formatTime = (date) =>
+    new Date(date).toLocaleTimeString("en-US", {
       hour: "2-digit",
       minute: "2-digit",
     });
-  };
 
   return (
     <div
-      style={{ display: "flex", height: "100vh", backgroundColor: "#f5f5f5" }}
+      style={{
+        display: "flex",
+        height: "100vh",
+        backgroundColor: "#f5f5f5",
+      }}
     >
       {/* Sidebar */}
       <div
@@ -131,7 +136,13 @@ function Chat({ user, onLogout }) {
         </div>
 
         <div style={{ flex: 1 }}>
-          <h3 style={{ fontSize: "14px", marginBottom: "15px", opacity: 0.8 }}>
+          <h3
+            style={{
+              fontSize: "14px",
+              marginBottom: "15px",
+              opacity: 0.8,
+            }}
+          >
             ONLINE USERS ({onlineUsers.length})
           </h3>
           <div>
@@ -175,7 +186,7 @@ function Chat({ user, onLogout }) {
         </button>
       </div>
 
-      {/* Main Chat Area */}
+      {/* Chat Area */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
         {/* Header */}
         <div

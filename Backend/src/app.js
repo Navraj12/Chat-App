@@ -1,7 +1,10 @@
+import dotenv from 'dotenv';
+dotenv.config();
 import cors from 'cors';
 import express from 'express';
 import { connect } from 'mongoose';
 import { WebSocketServer } from 'ws';
+const app = express();
 
 const connectDB = async() => {
     try {

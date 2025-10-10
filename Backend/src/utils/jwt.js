@@ -1,13 +1,13 @@
 import pkg from 'jsonwebtoken';
 const { sign, verify } = pkg;
 
-const generateToken = (userId) => {
+export const generateToken = (userId) => {
     return sign({ id: userId }, process.env.JWT_SECRET, {
         expiresIn: process.env.JWT_EXPIRE
     });
 };
 
-const verifyToken = (token) => {
+export const verifyToken = (token) => {
     try {
         return verify(token, process.env.JWT_SECRET);
     } catch (error) {
@@ -15,4 +15,4 @@ const verifyToken = (token) => {
     }
 };
 
-export default { generateToken, verifyToken };
+// export default { generateToken, verifyToken };
