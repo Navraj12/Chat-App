@@ -1,4 +1,5 @@
 import { Schema, model } from 'mongoose';
+import { WebSocketServer } from 'ws'; // ✅ add this
 
 const messageSchema = new Schema({
     user: {
