@@ -11,23 +11,18 @@ function Chat({ user, onLogout }) {
   const messagesEndRef = useRef(null);
   const typingTimeoutRef = useRef(null);
 
-  // 🧠 Handler: new incoming message
+  // 🧠 Handlers
   const handleNewMessage = useCallback((message) => {
-    if (message.data) {
-      setMessages((prev) => [...prev, message.data]);
-    }
+    if (message.data) setMessages((prev) => [...prev, message.data]);
   }, []);
 
-  // 🧠 Handler: update online users
   const handleOnlineUsers = useCallback((message) => {
     setOnlineUsers(message.users || []);
   }, []);
 
-  // 🧠 Handler: show typing indicator
   const handleTyping = useCallback(
     (message) => {
       if (message.username === user.username) return;
-
       if (message.isTyping) {
         setTypingUsers((prev) =>
           prev.includes(message.username) ? prev : [...prev, message.username]
@@ -39,7 +34,6 @@ function Chat({ user, onLogout }) {
     [user.username]
   );
 
-  // 🧠 Connect to WebSocket and load messages
   useEffect(() => {
     const initChat = async () => {
       try {
@@ -68,12 +62,10 @@ function Chat({ user, onLogout }) {
     };
   }, [handleNewMessage, handleOnlineUsers, handleTyping]);
 
-  // 🧠 Scroll chat to bottom when messages update
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // 🧠 Send message
   const handleSendMessage = (e) => {
     e.preventDefault();
     if (newMessage.trim() && isConnected) {
@@ -83,18 +75,14 @@ function Chat({ user, onLogout }) {
     }
   };
 
-  // 🧠 Handle typing indicator
   const handleInputTyping = () => {
     websocketService.sendTyping(true);
-    if (typingTimeoutRef.current) {
-      clearTimeout(typingTimeoutRef.current);
-    }
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
     typingTimeoutRef.current = setTimeout(() => {
       websocketService.sendTyping(false);
     }, 1000);
   };
 
-  // 🧠 Logout
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
@@ -102,7 +90,6 @@ function Chat({ user, onLogout }) {
     onLogout();
   };
 
-  // 🧠 Time formatter
   const formatTime = (date) =>
     new Date(date).toLocaleTimeString("en-US", {
       hour: "2-digit",
@@ -110,60 +97,25 @@ function Chat({ user, onLogout }) {
     });
 
   return (
-    <div
-      style={{
-        display: "flex",
-        height: "100vh",
-        backgroundColor: "#f5f5f5",
-      }}
-    >
+    <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
-      <div
-        style={{
-          width: "250px",
-          backgroundColor: "#2c3e50",
-          color: "white",
-          padding: "20px",
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
-        <div style={{ marginBottom: "30px" }}>
-          <h2 style={{ margin: "0 0 10px 0" }}>Chat App</h2>
-          <p style={{ margin: 0, fontSize: "14px", opacity: 0.8 }}>
-            Welcome, {user.username}
-          </p>
+      <div className="w-64 bg-slate-800 text-white flex flex-col p-5">
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold">Chat App</h2>
+          <p className="text-sm opacity-80">Welcome, {user.username}</p>
         </div>
 
-        <div style={{ flex: 1 }}>
-          <h3
-            style={{
-              fontSize: "14px",
-              marginBottom: "15px",
-              opacity: 0.8,
-            }}
-          >
+        <div className="flex-1 overflow-y-auto">
+          <h3 className="text-sm mb-3 opacity-70">
             ONLINE USERS ({onlineUsers.length})
           </h3>
-          <div>
+          <div className="space-y-2">
             {onlineUsers.map((u) => (
               <div
                 key={u._id}
-                style={{
-                  padding: "8px 0",
-                  display: "flex",
-                  alignItems: "center",
-                }}
+                className="flex items-center space-x-2 text-sm py-1"
               >
-                <div
-                  style={{
-                    width: "8px",
-                    height: "8px",
-                    borderRadius: "50%",
-                    backgroundColor: "#2ecc71",
-                    marginRight: "10px",
-                  }}
-                />
+                <div className="w-2.5 h-2.5 bg-green-500 rounded-full"></div>
                 <span>{u.username}</span>
               </div>
             ))}
@@ -172,97 +124,51 @@ function Chat({ user, onLogout }) {
 
         <button
           onClick={handleLogout}
-          style={{
-            padding: "10px",
-            backgroundColor: "#e74c3c",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            cursor: "pointer",
-            marginTop: "auto",
-          }}
+          className="mt-auto bg-red-500 hover:bg-red-600 text-white py-2 rounded-md text-sm font-medium transition"
         >
           Logout
         </button>
       </div>
 
       {/* Chat Area */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+      <div className="flex-1 flex flex-col">
         {/* Header */}
-        <div
-          style={{
-            padding: "20px",
-            backgroundColor: "white",
-            borderBottom: "1px solid #ddd",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <h3 style={{ margin: 0 }}>General Chat</h3>
+        <div className="p-4 bg-white border-b flex items-center justify-between">
+          <h3 className="font-semibold text-lg">General Chat</h3>
           <div
-            style={{
-              padding: "5px 10px",
-              backgroundColor: isConnected ? "#d4edda" : "#f8d7da",
-              color: isConnected ? "#155724" : "#721c24",
-              borderRadius: "4px",
-              fontSize: "12px",
-            }}
+            className={`px-3 py-1 rounded text-xs font-medium ${
+              isConnected
+                ? "bg-green-100 text-green-700"
+                : "bg-red-100 text-red-700"
+            }`}
           >
             {isConnected ? "● Connected" : "● Disconnected"}
           </div>
         </div>
 
         {/* Messages */}
-        <div
-          style={{
-            flex: 1,
-            overflowY: "auto",
-            padding: "20px",
-            backgroundColor: "#ecf0f1",
-          }}
-        >
-          {messages.map((msg) => (
+        <div className="flex-1 overflow-y-auto p-5 bg-gray-200">
+          {messages.map((msg, index) => (
             <div
-              key={msg._id}
-              style={{
-                marginBottom: "15px",
-                display: "flex",
-                justifyContent:
-                  msg.username === user.username ? "flex-end" : "flex-start",
-              }}
+              key={`${msg._id || "temp"}-${index}`}
+              className={`mb-3 flex ${
+                msg.username === user.username ? "justify-end" : "justify-start"
+              }`}
             >
               <div
-                style={{
-                  maxWidth: "60%",
-                  padding: "10px 15px",
-                  backgroundColor:
-                    msg.username === user.username ? "#007bff" : "white",
-                  color: msg.username === user.username ? "white" : "#333",
-                  borderRadius: "8px",
-                  boxShadow: "0 1px 2px rgba(0,0,0,0.1)",
-                }}
+                className={`max-w-[60%] p-3 rounded-lg shadow-sm ${
+                  msg.username === user.username
+                    ? "bg-blue-600 text-white"
+                    : "bg-white text-gray-800"
+                }`}
               >
                 {msg.username !== user.username && (
-                  <div
-                    style={{
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      marginBottom: "5px",
-                      opacity: 0.8,
-                    }}
-                  >
+                  <div className="text-xs font-semibold mb-1 opacity-80">
                     {msg.username}
                   </div>
                 )}
-                <div style={{ marginBottom: "5px" }}>{msg.content}</div>
-                <div
-                  style={{
-                    fontSize: "11px",
-                    opacity: 0.7,
-                    textAlign: "right",
-                  }}
-                >
+                <div className="mb-1 text-sm">{msg.content}</div>
+                <div className="text-[11px] opacity-70 text-right">
                   {formatTime(msg.createdAt)}
                 </div>
               </div>
@@ -270,14 +176,7 @@ function Chat({ user, onLogout }) {
           ))}
 
           {typingUsers.length > 0 && (
-            <div
-              style={{
-                fontSize: "13px",
-                fontStyle: "italic",
-                color: "#666",
-                marginTop: "10px",
-              }}
-            >
+            <div className="text-sm italic text-gray-600 mt-2">
               {typingUsers.join(", ")} {typingUsers.length === 1 ? "is" : "are"}{" "}
               typing...
             </div>
@@ -289,13 +188,7 @@ function Chat({ user, onLogout }) {
         {/* Message Input */}
         <form
           onSubmit={handleSendMessage}
-          style={{
-            padding: "20px",
-            backgroundColor: "white",
-            borderTop: "1px solid #ddd",
-            display: "flex",
-            gap: "10px",
-          }}
+          className="p-4 bg-white border-t flex gap-2"
         >
           <input
             type="text"
@@ -305,27 +198,16 @@ function Chat({ user, onLogout }) {
               handleInputTyping();
             }}
             placeholder="Type a message..."
-            style={{
-              flex: 1,
-              padding: "12px",
-              border: "1px solid #ddd",
-              borderRadius: "4px",
-              fontSize: "14px",
-            }}
+            className="flex-1 border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
           <button
             type="submit"
             disabled={!newMessage.trim() || !isConnected}
-            style={{
-              padding: "12px 30px",
-              backgroundColor: "#007bff",
-              color: "white",
-              border: "none",
-              borderRadius: "4px",
-              cursor:
-                !newMessage.trim() || !isConnected ? "not-allowed" : "pointer",
-              opacity: !newMessage.trim() || !isConnected ? 0.5 : 1,
-            }}
+            className={`px-5 py-2 rounded-md text-white text-sm font-medium transition ${
+              !newMessage.trim() || !isConnected
+                ? "bg-blue-400 cursor-not-allowed opacity-50"
+                : "bg-blue-600 hover:bg-blue-700"
+            }`}
           >
             Send
           </button>

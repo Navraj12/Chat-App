@@ -1,128 +1,95 @@
-import { useState } from 'react';
-import { authAPI } from '../services/api';
+import { useState } from "react";
+import { authAPI } from "../services/api";
 
 function Login({ onLogin, onSwitchToRegister }) {
   const [formData, setFormData] = useState({
-    email: '',
-    password: ''
+    email: "",
+    password: "",
   });
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
 
     try {
       const response = await authAPI.login(formData);
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("user", JSON.stringify(response.data.user));
       onLogin(response.data.user);
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed');
+      setError(err.response?.data?.message || "Login failed");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div style={{ 
-      maxWidth: '400px', 
-      margin: '100px auto', 
-      padding: '30px',
-      border: '1px solid #ddd',
-      borderRadius: '8px',
-      backgroundColor: '#fff'
-    }}>
-      <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Login</h2>
-      
+    <div className="max-w-sm mx-auto mt-24 p-8 border border-gray-200 rounded-lg bg-white shadow-md">
+      <h2 className="text-2xl font-semibold text-center mb-6">Login</h2>
+
       {error && (
-        <div style={{
-          padding: '10px',
-          marginBottom: '15px',
-          backgroundColor: '#fee',
-          color: '#c33',
-          borderRadius: '4px'
-        }}>
+        <div className="p-3 mb-4 bg-red-100 text-red-700 text-sm rounded-md">
           {error}
         </div>
       )}
 
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: '15px' }}>
-          <label style={{ display: 'block', marginBottom: '5px' }}>Email</label>
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Email
+          </label>
           <input
             type="email"
             name="email"
             value={formData.email}
             onChange={handleChange}
             required
-            style={{
-              width: '100%',
-              padding: '10px',
-              border: '1px solid #ddd',
-              borderRadius: '4px',
-              fontSize: '14px'
-            }}
+            className="w-full p-2.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
-        <div style={{ marginBottom: '20px' }}>
-          <label style={{ display: 'block', marginBottom: '5px' }}>Password</label>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Password
+          </label>
           <input
             type="password"
             name="password"
             value={formData.password}
             onChange={handleChange}
             required
-            style={{
-              width: '100%',
-              padding: '10px',
-              border: '1px solid #ddd',
-              borderRadius: '4px',
-              fontSize: '14px'
-            }}
+            className="w-full p-2.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
         <button
           type="submit"
           disabled={loading}
-          style={{
-            width: '100%',
-            padding: '12px',
-            backgroundColor: '#007bff',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            fontSize: '16px',
-            cursor: loading ? 'not-allowed' : 'pointer',
-            opacity: loading ? 0.7 : 1
-          }}
+          className={`w-full py-2.5 rounded-md text-white font-medium transition ${
+            loading
+              ? "bg-blue-400 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700"
+          }`}
         >
-          {loading ? 'Logging in...' : 'Login'}
+          {loading ? "Logging in..." : "Login"}
         </button>
       </form>
 
-      <p style={{ textAlign: 'center', marginTop: '20px' }}>
-        Don't have an account?{' '}
+      <p className="text-center text-sm text-gray-600 mt-5">
+        Don’t have an account?{" "}
         <button
           onClick={onSwitchToRegister}
-          style={{
-            background: 'none',
-            border: 'none',
-            color: '#007bff',
-            cursor: 'pointer',
-            textDecoration: 'underline'
-          }}
+          className="text-blue-600 hover:underline font-medium"
         >
           Register
         </button>

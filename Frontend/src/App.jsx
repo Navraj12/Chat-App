@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import Login from './components/Login';
-import Register from './components/Register';
-import Chat from './components/Chat';
+import { useEffect, useState } from "react";
+import Chat from "./components/Chat";
+import Login from "./components/Login";
+import Register from "./components/Register";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -9,9 +9,9 @@ function App() {
 
   useEffect(() => {
     // Check if user is already logged in
-    const token = localStorage.getItem('token');
-    const savedUser = localStorage.getItem('user');
-    
+    const token = localStorage.getItem("token");
+    const savedUser = localStorage.getItem("user");
+
     if (token && savedUser) {
       setUser(JSON.parse(savedUser));
     }
@@ -34,18 +34,20 @@ function App() {
   }
 
   return (
-    <div style={{ 
-      minHeight: '100vh', 
-      backgroundColor: '#f0f2f5',
-      fontFamily: 'Arial, sans-serif'
-    }}>
+    <div
+      style={{
+        minHeight: "100vh",
+        backgroundColor: "#f0f2f5",
+        fontFamily: "Arial, sans-serif",
+      }}
+    >
       {showRegister ? (
-        <Register 
+        <Register
           onRegister={handleRegister}
           onSwitchToLogin={() => setShowRegister(false)}
         />
       ) : (
-        <Login 
+        <Login
           onLogin={handleLogin}
           onSwitchToRegister={() => setShowRegister(true)}
         />
