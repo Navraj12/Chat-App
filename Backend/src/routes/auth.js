@@ -1,29 +1,29 @@
-import { Router } from 'express';
-import authMiddleware from '../middleware/auth.js';
-import Message from '../models/message.js';
-import User from '../models/user.js';
-import { generateToken } from '../utils/jwt.js';
+import { Schema, model } from 'mongoose';
 
-const router = Router();
+const messageSchema = new Schema({
+    user: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    username: {
+        type: String,
+        required: true
+    },
+    content: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    room: {
+        type: String,
+        default: 'general'
+    }
+}, {
+    timestamps: true
+});
 
-// Register
-router.post('/register', async(req, res) => {
-    try {
-        const { username, email, password } = req.body;
-
-        // Check if user exists
-        const existingUser = await User.findOne({ $or: [{ email }, { username }] });
-        if (existingUser) {
-            return res.status(400).json({ message: 'User already exists' });
-        }
-
-        // Create user
-        const user = await User.create({ username, email, password });
-        const token = generateToken(user._id);
-
-        res.status(201).json({
-            token,
-            user: {
+export default model('Message', messageSchema);
                 id: user._id,
                 username: user.username,
                 email: user.email

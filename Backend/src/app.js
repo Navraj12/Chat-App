@@ -1,29 +1,29 @@
-import dotenv from 'dotenv';
-dotenv.config();
-import cors from 'cors';
-import express from 'express';
-import { connect } from 'mongoose';
-import { WebSocketServer } from 'ws';
-const app = express();
-const connectDB = async() => {
-    try {
-        await connect(process.env.MONGODB_URI);
-        console.log('MongoDB connected successfully');
-    } catch (error) {
-        console.error('MongoDB connection error:', error);
-        process.exit(1);
+import { Schema, model } from 'mongoose';
+
+const messageSchema = new Schema({
+    user: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    username: {
+        type: String,
+        required: true
+    },
+    content: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    room: {
+        type: String,
+        default: 'general'
     }
-};
-export default connectDB;
-// eServer(app);
-// Create an HTTP server from Express
-import http from 'http';
-import WebSocket from 'ws';
-import Message from './models/message.js';
-import User from './models/user.js';
-import authRoutes from './routes/auth.js';
-import { verifyToken } from './utils/jwt.js';
-const server = http.createServer(app);
+}, {
+    timestamps: true
+});
+
+export default model('Message', messageSchema);
 const wss = new WebSocketServer({ server });
 // Connect to MongoDB
 connectDB();
