@@ -1,46 +1,43 @@
-import { Schema, model } from 'mongoose';
-import { WebSocketServer } from 'ws'; // ✅ add this
+import cors from 'cors';
+import express from 'express';
+import http from 'http';
+import { WebSocket, WebSocketServer } from 'ws';
+import { connectDB } from './config/db.js'; // your MongoDB connection
+import Message from './models/message.js';
+import User from './models/user.js';
+import authRoutes from './routes/authRoutes.js'; // adjust path if needed
+import { verifyToken } from './utils/auth.js'; // your JWT verify function
 
-const messageSchema = new Schema({
-    user: {
-        type: Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
-    },
-    username: {
-        type: String,
-        required: true
-    },
-    content: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    room: {
-        type: String,
-        default: 'general'
-    }
-}, {
-    timestamps: true
-});
+// Initialize Express
+const app = express();
 
-export default model('Message', messageSchema);
-const wss = new WebSocketServer({ server });
-// Connect to MongoDB
-connectDB();
 // Middleware
 app.use(cors({ origin: process.env.CLIENT_URL }));
 app.use(express.json());
+
 // Routes
 app.use('/api/auth', authRoutes);
+
+// Connect to MongoDB
+connectDB();
+
+// Create HTTP server
+const server = http.createServer(app);
+
+// Create WebSocket server
+const wss = new WebSocketServer({ server });
+
 // Store connected clients
 const clients = new Map();
+
 // WebSocket connection handler
-wss.on('connection', async(ws, req) => {
+wss.on('connection', (ws) => {
     console.log('New WebSocket connection');
+
     ws.on('message', async(data) => {
         try {
             const message = JSON.parse(data);
+
             // Handle authentication
             if (message.type === 'auth') {
                 const decoded = verifyToken(message.token);
@@ -50,17 +47,15 @@ wss.on('connection', async(ws, req) => {
                         ws.userId = user._id.toString();
                         ws.username = user.username;
                         clients.set(ws.userId, ws);
-                        // Update user online status
+
+                        // Update online status
                         await User.findByIdAndUpdate(user._id, { online: true });
-                        // Send success message
+
                         ws.send(JSON.stringify({
                             type: 'auth_success',
-                            user: {
-                                id: user._id,
-                                username: user.username
-                            }
+                            user: { id: user._id, username: user.username }
                         }));
-                        // Broadcast online users
+
                         broadcastOnlineUsers();
                         console.log(`User authenticated: ${user.username}`);
                     }
@@ -79,8 +74,7 @@ wss.on('connection', async(ws, req) => {
                     room: message.room || 'general'
                 });
 
-                // Broadcast message to all clients
-                const broadcastMessage = {
+                broadcast({
                     type: 'chat_message',
                     data: {
                         _id: newMessage._id,
@@ -89,9 +83,7 @@ wss.on('connection', async(ws, req) => {
                         content: newMessage.content,
                         createdAt: newMessage.createdAt
                     }
-                };
-
-                broadcast(broadcastMessage);
+                });
             }
 
             // Handle typing indicator
@@ -111,12 +103,10 @@ wss.on('connection', async(ws, req) => {
         if (ws.userId) {
             clients.delete(ws.userId);
 
-            // Update user online status
+            // Update online status
             await User.findByIdAndUpdate(ws.userId, { online: false });
-
             console.log(`User disconnected: ${ws.username}`);
 
-            // Broadcast updated online users
             broadcastOnlineUsers();
         }
     });
@@ -126,7 +116,7 @@ wss.on('connection', async(ws, req) => {
     });
 });
 
-// Broadcast message to all connected clients
+// Broadcast message to all clients
 function broadcast(message, excludeWs = null) {
     const messageStr = JSON.stringify(message);
     clients.forEach((client) => {
@@ -149,8 +139,6 @@ async function broadcastOnlineUsers() {
     }
 }
 
+// Start server
 const PORT = process.env.PORT || 5000;
-
-server.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
