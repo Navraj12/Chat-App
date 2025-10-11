@@ -5,7 +5,6 @@ import express from 'express';
 import { connect } from 'mongoose';
 import { WebSocketServer } from 'ws';
 const app = express();
-
 const connectDB = async() => {
     try {
         await connect(process.env.MONGODB_URI);
@@ -15,7 +14,6 @@ const connectDB = async() => {
         process.exit(1);
     }
 };
-
 export default connectDB;
 // eServer(app);
 // Create an HTTP server from Express
@@ -27,42 +25,32 @@ import authRoutes from './routes/auth.js';
 import { verifyToken } from './utils/jwt.js';
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
-
 // Connect to MongoDB
 connectDB();
-
 // Middleware
 app.use(cors({ origin: process.env.CLIENT_URL }));
 app.use(express.json());
-
 // Routes
 app.use('/api/auth', authRoutes);
-
 // Store connected clients
 const clients = new Map();
-
 // WebSocket connection handler
 wss.on('connection', async(ws, req) => {
     console.log('New WebSocket connection');
-
     ws.on('message', async(data) => {
         try {
             const message = JSON.parse(data);
-
             // Handle authentication
             if (message.type === 'auth') {
                 const decoded = verifyToken(message.token);
-
                 if (decoded) {
                     const user = await User.findById(decoded.id);
                     if (user) {
                         ws.userId = user._id.toString();
                         ws.username = user.username;
                         clients.set(ws.userId, ws);
-
                         // Update user online status
                         await User.findByIdAndUpdate(user._id, { online: true });
-
                         // Send success message
                         ws.send(JSON.stringify({
                             type: 'auth_success',
@@ -71,10 +59,8 @@ wss.on('connection', async(ws, req) => {
                                 username: user.username
                             }
                         }));
-
                         // Broadcast online users
                         broadcastOnlineUsers();
-
                         console.log(`User authenticated: ${user.username}`);
                     }
                 } else {
