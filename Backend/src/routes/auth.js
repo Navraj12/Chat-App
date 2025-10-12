@@ -1,29 +1,29 @@
-import { Schema, model } from 'mongoose';
+const express = require('express');
+const User = require('../models/user.js');
+const Message = require('../models/message.js');
+const { generateToken } = require('../utils/jwt');
+const authMiddleware = require('../middleware/auth');
 
-const messageSchema = new Schema({
-    user: {
-        type: Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
-    },
-    username: {
-        type: String,
-        required: true
-    },
-    content: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    room: {
-        type: String,
-        default: 'general'
-    }
-}, {
-    timestamps: true
-});
+const router = express.Router();
 
-export default model('Message', messageSchema);
+// Register
+router.post('/register', async(req, res) => {
+    try {
+        const { username, email, password } = req.body;
+
+        // Check if user exists
+        const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+        if (existingUser) {
+            return res.status(400).json({ message: 'User already exists' });
+        }
+
+        // Create user
+        const user = await User.create({ username, email, password });
+        const token = generateToken(user._id);
+
+        res.status(201).json({
+            token,
+            user: {
                 id: user._id,
                 username: user.username,
                 email: user.email
@@ -81,7 +81,7 @@ router.get('/me', authMiddleware, async(req, res) => {
 router.get('/messages', authMiddleware, async(req, res) => {
     try {
         const messages = await Message.find()
-            .sort({ createdAt: 1 })
+            .sort({ createdAt: -1 })
             .limit(50)
             .populate('user', 'username');
 
@@ -101,4 +101,4 @@ router.get('/users/online', authMiddleware, async(req, res) => {
     }
 });
 
-export default router;
+module.exports = router;
