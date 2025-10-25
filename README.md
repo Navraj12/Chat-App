@@ -35,6 +35,42 @@ The code repository contains separate folders for **Backend** and **Frontend**. 
 - API for user & chat data  
 
 
+## Getting Started
+
+### Prerequisites  
+Make sure you have installed:  
+- Node.js (and npm)  
+- (Optional) MongoDB or another database if your backend uses one  
+- (Optional) A modern web browser  
+
+### Installation  
+1. Clone the repository  
+   ```bash
+   git clone https://github.com/Navraj12/Chat-App.git
+   cd Chat-App
+
+2. Install backend dependencies   
+cd Backend
+npm install
+
+3. Install frontend dependencies
+cd Frontend
+npm install
+
+Running the App
+
+1.Start the backend server
+cd Backend
+npm start
+
+2.Start the frontend
+cd Frontend
+npm start
+
+3.Open your web browser and navigate to http://localhost:3000 (or whichever port your frontend uses)
+(If the live demo is already deployed, you can skip local setup and use the demo URL.)
+
+
 
 
 
