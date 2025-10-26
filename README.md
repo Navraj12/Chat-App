@@ -26,7 +26,7 @@ The code repository contains separate folders for **Backend** and **Frontend**. 
 
 ### Frontend  
 - React, Tailwind CSS  
-- Likely usage of a modern framework/library (e.g., React, Vue)  
+- Likely usage of a modern framework/library 
 - Responsive design  
 
 ### Backend  
@@ -69,6 +69,7 @@ npm start
 
 3.Open your web browser and navigate to http://localhost:3000 (or whichever port your frontend uses)
 (If the live demo is already deployed, you can skip local setup and use the demo URL.)
+
 
 
 
