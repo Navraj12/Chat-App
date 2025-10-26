@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import authMiddleware from '../middleware/auth';
+import authMiddleware from '../middleware/auth.js';
 import { find as _find } from '../models/message.js';
 import { create, find, findOne } from '../models/user.js';
-import { generateToken } from '../utils/jwt';
+import { generateToken } from '../utils/jwt.js';
 
 const router = Router();
 
