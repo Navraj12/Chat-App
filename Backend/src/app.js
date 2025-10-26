@@ -6,7 +6,7 @@ import { connectDB } from './config/db.js'; // your MongoDB connection
 import Message from './models/message.js';
 import User from './models/user.js';
 import authRoutes from './routes/auth.js'; // adjust path if needed
-import { verifyToken } from './utils/auth.js'; // your JWT verify function
+import { verifyToken } from './utils/jwt.js'; // your JWT verify function
 
 // Initialize Express
 const app = express();
