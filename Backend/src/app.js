@@ -14,7 +14,7 @@ const app = express();
 // Middleware
 const allowedOrigins = [
     "http://localhost:5173",
-    "https://chat-app-lkvp.vercel.app/", // your Vercel frontend
+    "https://chat-app-lkvp.vercel.app", // your Vercel frontend
 ];
 
 app.use(cors({
@@ -30,6 +30,8 @@ app.use(cors({
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
 }));
+
+
 app.use(express.json());
 
 // Connect to MongoDB
