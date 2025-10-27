@@ -15,11 +15,13 @@ const app = express();
 app.use(cors({ origin: process.env.CLIENT_URL }));
 app.use(express.json());
 
+// Connect to MongoDB
+await connectDB();
+
 // Routes
 app.use('/api/auth', authRoutes);
 
-// Connect to MongoDB
-connectDB();
+
 
 // Create HTTP server
 const server = http.createServer(app);
