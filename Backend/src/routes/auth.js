@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import authMiddleware from '../middleware/auth.js';
-import { find as _find } from '../models/message.js';
+import Message from '../models/message.js';
 import { create, find, findOne } from '../models/user.js';
 import { generateToken } from '../utils/jwt.js';
 
@@ -80,7 +80,7 @@ router.get('/me', authMiddleware, async(req, res) => {
 // Get messages
 router.get('/messages', authMiddleware, async(req, res) => {
     try {
-        const messages = await _find()
+        const messages = await Message.find()
             .sort({ createdAt: -1 })
             .limit(50)
             .populate('user', 'username');
