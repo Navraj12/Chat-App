@@ -6,7 +6,7 @@ class WebSocketService {
 
     connect(token) {
         return new Promise((resolve, reject) => {
-            this.ws = new WebSocket('ws://localhost:5000');
+            this.ws = new WebSocket('wss://chat-app-2-8xkv.onrender.com');
 
             this.ws.onopen = () => {
                 console.log('WebSocket connected');
