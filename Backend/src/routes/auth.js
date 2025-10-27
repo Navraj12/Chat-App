@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import authMiddleware from '../middleware/auth.js';
 import Message from '../models/message.js';
-import { create, find, findOne } from '../models/user.js';
+import User from '../models/user.js';
 import { generateToken } from '../utils/jwt.js';
 
 const router = Router();
@@ -12,13 +12,13 @@ router.post('/register', async(req, res) => {
         const { username, email, password } = req.body;
 
         // Check if user exists
-        const existingUser = await findOne({ $or: [{ email }, { username }] });
+        const existingUser = await User.findOne({ $or: [{ email }, { username }] });
         if (existingUser) {
             return res.status(400).json({ message: 'User already exists' });
         }
 
         // Create user
-        const user = await create({ username, email, password });
+        const user = await User.create({ username, email, password });
         const token = generateToken(user._id);
 
         res.status(201).json({
@@ -40,7 +40,7 @@ router.post('/login', async(req, res) => {
         const { email, password } = req.body;
 
         // Find user
-        const user = await findOne({ email });
+        const user = await User.findOne({ email });
         if (!user) {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
