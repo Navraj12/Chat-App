@@ -2,7 +2,7 @@ import cors from 'cors';
 import express from 'express';
 import http from 'http';
 import { WebSocket, WebSocketServer } from 'ws';
-import { connectDB } from './config/db.js'; // your MongoDB connection
+import connectDB from './config/db.js'; // your MongoDB connection
 import Message from './models/message.js';
 import User from './models/user.js';
 import authRoutes from './routes/auth.js';
