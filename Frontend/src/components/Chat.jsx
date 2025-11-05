@@ -11,7 +11,6 @@ function Chat({ user, onLogout }) {
   const messagesEndRef = useRef(null);
   const typingTimeoutRef = useRef(null);
 
-  // 🧠 Handlers
   const handleNewMessage = useCallback((message) => {
     if (message.data) setMessages((prev) => [...prev, message.data]);
   }, []);
@@ -98,7 +97,7 @@ function Chat({ user, onLogout }) {
 
   return (
     <div className="flex h-screen bg-gray-100">
-      {/* Sidebar */}
+      
       <div className="w-64 bg-slate-800 text-white flex flex-col p-5">
         <div className="mb-8">
           <h2 className="text-xl font-semibold">Chat App</h2>
@@ -130,9 +129,8 @@ function Chat({ user, onLogout }) {
         </button>
       </div>
 
-      {/* Chat Area */}
+      
       <div className="flex-1 flex flex-col">
-        {/* Header */}
         <div className="p-4 bg-white border-b flex items-center justify-between">
           <h3 className="font-semibold text-lg">General Chat</h3>
           <div
@@ -146,7 +144,6 @@ function Chat({ user, onLogout }) {
           </div>
         </div>
 
-        {/* Messages */}
         <div className="flex-1 overflow-y-auto p-5 bg-gray-200">
           {messages.map((msg, index) => (
             <div
@@ -185,7 +182,6 @@ function Chat({ user, onLogout }) {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Message Input */}
         <form
           onSubmit={handleSendMessage}
           className="p-4 bg-white border-t flex gap-2"
