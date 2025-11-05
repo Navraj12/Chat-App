@@ -58,7 +58,7 @@ function Register({ onRegister, onSwitchToLogin }) {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-5">
-        {/* Username */}
+        
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Username
@@ -74,7 +74,7 @@ function Register({ onRegister, onSwitchToLogin }) {
           />
         </div>
 
-        {/* Email */}
+      
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Email
@@ -89,7 +89,7 @@ function Register({ onRegister, onSwitchToLogin }) {
           />
         </div>
 
-        {/* Password */}
+        
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Password
@@ -105,7 +105,7 @@ function Register({ onRegister, onSwitchToLogin }) {
           />
         </div>
 
-        {/* Confirm Password */}
+        
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Confirm Password
@@ -120,7 +120,7 @@ function Register({ onRegister, onSwitchToLogin }) {
           />
         </div>
 
-        {/* Submit Button */}
+        
         <button
           type="submit"
           disabled={loading}
@@ -134,7 +134,7 @@ function Register({ onRegister, onSwitchToLogin }) {
         </button>
       </form>
 
-      {/* Switch to Login */}
+      
       <div className="text-center mt-5">
         <button
           onClick={onSwitchToLogin}
