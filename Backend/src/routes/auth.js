@@ -94,7 +94,7 @@ router.get('/messages', authMiddleware, async(req, res) => {
 // Get online users
 router.get('/users/online', authMiddleware, async(req, res) => {
     try {
-        const users = await find({ online: true }).select('username _id');
+        const users = await User.find({ online: true }).select('username _id');
         res.json(users);
     } catch (error) {
         res.status(500).json({ message: error.message });
