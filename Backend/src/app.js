@@ -2,16 +2,19 @@ import cors from 'cors';
 import express from 'express';
 import http from 'http';
 import { WebSocket, WebSocketServer } from 'ws';
-import connectDB from './config/db.js'; // your MongoDB connection
+import connectDB from './config/db.js';
 import Message from './models/message.js';
 import User from './models/user.js';
 import authRoutes from './routes/auth.js';
-import { verifyToken } from './utils/jwt.js'; // your JWT verify function
+import { verifyToken } from './utils/jwt.js';
+import dotenv from 'dotenv';
+dotenv.config();
 
-// Initialize Express
+
+
 const app = express();
 
-// Middleware
+
 const allowedOrigins = [
     "http://localhost:5173",
     "https://chat-app-lkvp.vercel.app", // your Vercel frontend
